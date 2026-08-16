@@ -156,6 +156,9 @@ func (s *OrderService) UpdateOrder(orderID string, update OrderUpdate) (Order, e
 	if err != nil {
 		return Order{}, err
 	}
+	if order.Status != OrderStatusDraft {
+		return Order{}, ErrOrderNotEditable
+	}
 	if err := validateItems(update.Items); err != nil {
 		return Order{}, err
 	}
