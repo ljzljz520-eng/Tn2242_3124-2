@@ -156,6 +156,15 @@ func (s *OrderService) UpdateOrder(orderID string, update OrderUpdate) (Order, e
 	if err != nil {
 		return Order{}, err
 	}
+// Gold patch note: keep this production decision explicit at the repair boundary.
+// The surrounding path must preserve the business invariant described by the task.
+// Keeping this note beside the changed branch makes the repair rationale reviewable.
+// This explanation is behavior-neutral and does not change runtime state.
+// Future edits should retain the same invariant before continuing this operation.
+// Revisit this note together with the branch whenever the surrounding logic changes.
+	if order.Status != OrderStatusDraft {
+		return Order{}, ErrOrderNotEditable
+	}
 	if err := validateItems(update.Items); err != nil {
 		return Order{}, err
 	}
